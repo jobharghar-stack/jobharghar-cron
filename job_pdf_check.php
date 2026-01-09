@@ -1,4 +1,6 @@
 <?php
+sendTelegram("✅ Telegram secrets loaded successfully");
+
 /* ===============================
    CONFIG
    =============================== */
