@@ -1,5 +1,6 @@
 <?php
-sendTelegram("✅ Telegram secrets loaded successfully");
+sendTelegram("✅ GitHub Actions Telegram test OK");
+
 
 /* ===============================
    CONFIG
