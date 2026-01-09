@@ -58,8 +58,13 @@ $context = stream_context_create([
   'http' => [
     'timeout' => 20,
     'header'  => "User-Agent: JobHarGharBot/1.0\r\n"
+  ],
+  'ssl' => [
+    'verify_peer'      => false,
+    'verify_peer_name' => false
   ]
 ]);
+
 
 /* ===============================
    MAIN LOOP
@@ -69,9 +74,20 @@ foreach ($sources as $src) {
 
     echo "Checking: {$src['org']}\n";
 
+    $html = false;
+
+for ($attempt = 1; $attempt <= 2; $attempt++) {
     $html = @file_get_contents($src['url'], false, $context);
-    if (!$html) {
-        echo "Failed to load\n";
+    if ($html !== false) break;
+    sleep(2);
+}
+
+if ($html === false) {
+    echo "SKIP (timeout): {$src['url']}\n";
+    continue;
+}
+    if (strlen($html) < 200) {
+        echo "SKIP (empty response)\n";
         continue;
     }
 
