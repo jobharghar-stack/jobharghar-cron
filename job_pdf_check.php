@@ -1,5 +1,4 @@
 <?php
-sendTelegram("✅ GitHub Actions Telegram test OK");
 
 
 /* ===============================
