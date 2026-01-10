@@ -36,8 +36,6 @@ function sendTelegram($msg) {
     ];
     file_get_contents($url . "?" . http_build_query($params));
 }
-sendTelegram("🚀 Telegram is working from GitHub Actions");
-exit;
 
 /* ===============================
    LOAD STATE
