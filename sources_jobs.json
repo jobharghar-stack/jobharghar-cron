@@ -1,22 +1,54 @@
 [
   {
-    "name": "DSSSB",
+    "org": "DSSSB",
     "url": "https://dsssb.delhi.gov.in/notifications"
   },
-  {
-    "name": "JKSSB",
-    "url": "https://www.jkssb.nic.in/Advertisement.html"
+   {
+    "org": "IBPS",
+    "url": "https://www.ibps.in/index.php/recruitment/"
   },
   {
-    "name": "BTSC Bihar",
-    "url": "https://btsc.bihar.gov.in/latest-update"
+    "org": "SSC",
+    "url": "https://ssc.gov.in/home/notice-board"
+  },
+    {
+    "org": "SBI",
+    "url": "https://sbi.bank.in/web/careers/current-openings"
   },
   {
-    "name": "UPSC",
+    "org": "UPSC",
     "url": "https://upsc.gov.in/recruitment/recruitment-advertisement"
   },
   {
-    "name": "UPSSSC",
+    "org": "UPSSSC",
     "url": "https://upsssc.gov.in/AllNotifications.aspx"
+  },
+    {
+    "org": "AIIMS",
+    "url": "https://www.aiimsexams.ac.in/advertisement/68f141523370380d8939200c"
+  },
+  {
+    "org": "RRB",
+    "url": "https://www.rrbapply.gov.in/#/auth/landing"
+  },
+    {
+    "org": "JKSSB",
+    "url": "https://www.jkssb.nic.in/Advertisement.html"
+  },
+   {
+    "org": "RBI",
+    "url": "https://opportunities.rbi.org.in/scripts/vacancies.aspx"
+  },
+  {
+    "org": "RITES",
+    "url": "https://rites.com/Career"
+  },
+  {
+    "org": "GSSSB",
+    "url": "https://gsssb.gujarat.gov.in/Notification"
+  },
+  {
+    "org": "BTSC",
+    "url": "https://btsc.bihar.gov.in/recruitment"
   }
 ]
