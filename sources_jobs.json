@@ -51,4 +51,28 @@
     "org": "BTSC",
     "url": "https://btsc.bihar.gov.in/recruitment"
   }
+  {
+    "org": "IOCL",
+    "url": "https://www.iocl.com/latest-job-opening"
+  },
+  {
+    "org": "VMMC",
+    "url": "https://vmmc-sjh.mohfw.gov.in/recruitment"
+  },
+  {
+    "org": "WBPPE",
+    "url": "https://wbbpe.wb.gov.in/pages/notice.aspx"
+  },
+  {
+    "org": "HPSC",
+    "url": "https://hpsc.gov.in/en-us/Instructions"
+  },
+   {
+    "org": "IB",
+    "url": "https://xn--i1b5bzbybhfo5c8b4bxh.xn--11b7cb3a6a.xn--h2brj9c/en/notifications/vacancies"
+  },
+  {
+    "org": "BEL",
+    "url": "https://bel-india.in/job-notifications/"
+  }
 ]
