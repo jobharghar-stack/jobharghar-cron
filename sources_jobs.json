@@ -74,5 +74,38 @@
   {
     "org": "BEL",
     "url": "https://bel-india.in/job-notifications/"
+  },
+  {
+    "org": "ESIC",
+    "url": "https://esic.gov.in/recruitments"
+  },
+  {
+    "org": "EPFO",
+    "url": "https://www.epfindia.gov.in/site_en/Updates.php"
+  },
+  {
+    "org": "MPSC",
+    "url": "https://mpsc.gov.in/adv_notification/8"
+  },
+  {
+    "org": "NHB",
+    "url": "https://www.nhb.org.in/oppurtunitiesnhb/"
+  },
+  {
+    "org": "Income Tax",
+    "url": "https://incometaxindia.gov.in/Pages/recruitment-notices.aspx"
+  },
+   {
+    "org": "DFCCIL",
+    "url": "https://dfccil.com/Carrer/index?Id=1"
+  },
+    {
+    "org": "SCI",
+    "url": "https://www.sci.gov.in/recruitments/"
+  },
+     {
+    "org": "NIOS",
+    "url": "https://recruitment.nios.ac.in/"
   }
 ]
+
