@@ -1,6 +1,5 @@
 <?php
 
-
 /* ===============================
    CONFIG
    =============================== */
@@ -17,12 +16,17 @@ $IGNORE_KEYWORDS = [
     'result','answer','merit','score','selection'
 ];
 
+$PAGE_KEYWORDS = [
+    'recruit','vacancy','advertisement',
+    'engagement','appointment','walkin'
+];
+
 /* ===============================
    TELEGRAM
    =============================== */
 
 $BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN');
-$CHAT_ID  = getenv('TELEGRAM_CHAT_ID');
+$CHAT_ID   = getenv('TELEGRAM_CHAT_ID');
 
 function sendTelegram($msg) {
     global $BOT_TOKEN, $CHAT_ID;
@@ -31,9 +35,28 @@ function sendTelegram($msg) {
     $url = "https://api.telegram.org/bot{$BOT_TOKEN}/sendMessage";
     $params = [
         'chat_id' => $CHAT_ID,
-        'text' => $msg
+        'text'    => $msg,
+        'disable_web_page_preview' => true
     ];
-    file_get_contents($url . "?" . http_build_query($params));
+    @file_get_contents($url . "?" . http_build_query($params));
+}
+
+/* ===============================
+   HELPERS
+   =============================== */
+
+function isJobPage($html, $keywords) {
+    $text = strtolower(strip_tags($html));
+    foreach ($keywords as $k) {
+        if (strpos($text, $k) !== false) return true;
+    }
+    return false;
+}
+
+function makeAbsoluteUrl($baseUrl, $link) {
+    if (strpos($link, 'http') === 0) return $link;
+    $p = parse_url($baseUrl);
+    return $p['scheme'].'://'.$p['host'].'/'.ltrim($link,'/');
 }
 
 /* ===============================
@@ -45,13 +68,13 @@ $seen    = file_exists($seenFile)
          ? json_decode(file_get_contents($seenFile), true)
          : [];
 
-if (!$sources) {
+if (!$sources || !is_array($sources)) {
     sendTelegram("❌ Sources file empty or invalid");
     exit;
 }
 
 /* ===============================
-   HTTP CONTEXT (timeout)
+   HTTP CONTEXT
    =============================== */
 
 $context = stream_context_create([
@@ -65,45 +88,56 @@ $context = stream_context_create([
   ]
 ]);
 
-
 /* ===============================
    MAIN LOOP
    =============================== */
 
 foreach ($sources as $src) {
 
-    echo "Checking: {$src['org']}\n";
+    $org = $src['org'] ?? 'Unknown';
+    echo "Checking: {$org}\n";
 
     $html = false;
 
-for ($attempt = 1; $attempt <= 2; $attempt++) {
-    $html = @file_get_contents($src['url'], false, $context);
-    if ($html !== false) break;
-    sleep(2);
-}
+    for ($attempt = 1; $attempt <= 2; $attempt++) {
+        $html = @file_get_contents($src['url'], false, $context);
+        if ($html !== false) break;
+        sleep(2);
+    }
 
-if ($html === false) {
-    echo "SKIP (timeout): {$src['url']}\n";
-    continue;
-}
-    if (strlen($html) < 200) {
-        echo "SKIP (empty response)\n";
+    if ($html === false || strlen($html) < 200) {
+        echo "SKIP (timeout/empty): {$src['url']}\n";
         continue;
     }
+
+    /* ===============================
+       EMPLOYMENT NEWS (SPECIAL)
+       =============================== */
+
+    if (stripos($src['url'], 'employmentnews') !== false) {
+        $pageHash = md5($html);
+        if (($seen[$org]['page']['home'] ?? '') !== $pageHash) {
+            sendTelegram("📰 Employment News updated\n🔗 {$src['url']}");
+            $seen[$org]['page']['home'] = $pageHash;
+        }
+    }
+
+    /* ===============================
+       PDF DETECTION
+       =============================== */
 
     preg_match_all('/href=["\']([^"\']+\.pdf)["\']/i', $html, $m);
     $pdfs = array_unique($m[1] ?? []);
 
     foreach ($pdfs as $pdf) {
 
+        $pdf = makeAbsoluteUrl($src['url'], $pdf);
         $name = strtolower(basename($pdf));
 
-        // ignore non-job PDFs
         foreach ($IGNORE_KEYWORDS as $bad) {
             if (strpos($name, $bad) !== false) continue 2;
         }
 
-        // allow only job PDFs
         $isJob = false;
         foreach ($JOB_KEYWORDS as $good) {
             if (strpos($name, $good) !== false) {
@@ -112,17 +146,54 @@ if ($html === false) {
         }
         if (!$isJob) continue;
 
-        if (!isset($seen[$src['org']][$name])) {
+        $content = @file_get_contents($pdf, false, $context);
+        if (!$content) continue;
 
-            $msg = "📢 New Job PDF\n"
-                 . "🏢 {$src['org']}\n"
-                 . "📄 {$pdf}";
+        $hash = md5($content);
 
-            sendTelegram($msg);
-            echo "ALERT: $name\n";
+        if (($seen[$org]['pdf'][$pdf] ?? '') === $hash) continue;
 
-            $seen[$src['org']][$name] = date('c');
-        }
+        sendTelegram(
+            "📢 New/Updated Job PDF\n".
+            "🏢 {$org}\n".
+            "📄 {$pdf}"
+        );
+
+        $seen[$org]['pdf'][$pdf] = $hash;
+    }
+
+    /* ===============================
+       HTML RECRUITMENT PAGE DETECTION
+       =============================== */
+
+    preg_match_all(
+      '/href=["\']([^"\']+(?:recruit|vacancy|notification|advertisement)[^"\']*)["\']/i',
+      $html,
+      $links
+    );
+
+    $jobPages = array_unique($links[1] ?? []);
+
+    foreach ($jobPages as $link) {
+
+        $link = makeAbsoluteUrl($src['url'], $link);
+
+        $pageHtml = @file_get_contents($link, false, $context);
+        if (!$pageHtml || strlen($pageHtml) < 300) continue;
+
+        if (!isJobPage($pageHtml, $PAGE_KEYWORDS)) continue;
+
+        $hash = md5($pageHtml);
+
+        if (($seen[$org]['page'][$link] ?? '') === $hash) continue;
+
+        sendTelegram(
+            "🆕 Recruitment Page Updated\n".
+            "🏢 {$org}\n".
+            "🔗 {$link}"
+        );
+
+        $seen[$org]['page'][$link] = $hash;
     }
 }
 
@@ -136,4 +207,3 @@ file_put_contents(
 );
 
 echo "Done\n";
-
