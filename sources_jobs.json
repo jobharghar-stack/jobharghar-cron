@@ -131,13 +131,21 @@
     "org": "UBI",
     "url": "https://www.unionbankofindia.bank.in/en/common/recruitment"
   },
-    {
-    "org": "Canara Bank",
-    "url": "https://canarabank.bank.in/pages/recruitment"
-  },
      {
     "org": "PNB",
     "url": "https://pnb.bank.in/recruitments.aspx"
+  },
+   {
+    "org": "NIACL",
+    "url": "https://www.newindia.co.in/recruitment/list"
+  },
+    {
+    "org": "HFW",
+    "url": "https://health.delhi.gov.in/vacancy"
+  },
+   {
+    "org": "Jharkhand",
+    "url": "https://recruitment.jharkhand.gov.in/"
   }
 ]
 
