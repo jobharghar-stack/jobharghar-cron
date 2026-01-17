@@ -44,6 +44,30 @@
     "url": "https://rites.com/Career"
   },
   {
+    "org": "Central Bank",
+    "url": "https://centralbank.bank.in/en/recruitments"
+  },
+  {
+    "org": "Bank of Maharastra",
+    "url": "https://bankofmaharashtra.bank.in/current-openings"
+  },
+  {
+    "org": "UBI",
+    "url": "https://www.unionbankofindia.bank.in/en/common/recruitment"
+  },
+    {
+    "org": "Canara Bank",
+    "url": "https://canarabank.bank.in/pages/recruitment"
+  },
+     {
+    "org": "PNB",
+    "url": "https://pnb.bank.in/recruitments.aspx"
+  },
+     {
+    "org": "Indian Bank",
+    "url": "https://indianbank.bank.in/career/"
+  },
+  {
     "org": "GSSSB",
     "url": "https://gsssb.gujarat.gov.in/Notification"
   },
@@ -65,7 +89,7 @@
   },
    {
     "org": "IB",
-    "url": "https://xn--i1b5bzbybhfo5c8b4bxh.xn--11b7cb3a6a.xn--h2brj9c/en/notifications/vacancies"
+    "url": "https://www.mha.gov.in/en/notifications/vacancies"
   },
   {
     "org": "BEL",
@@ -122,10 +146,6 @@
      {
     "org": "PNB",
     "url": "https://pnb.bank.in/recruitments.aspx"
-  },
-     {
-    "org": "Indian Bank",
-    "url": "https://indianbank.bank.in/career/"
   }
 ]
 
