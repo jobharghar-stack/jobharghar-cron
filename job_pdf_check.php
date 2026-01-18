@@ -57,7 +57,7 @@ if (!$sources) {
 
 $context = stream_context_create([
   'http' => [
-    'timeout' => 20,
+    'timeout' => 30,
     'header'  => "User-Agent: JobHarGharBot/1.0\r\n"
   ],
   'ssl' => [
