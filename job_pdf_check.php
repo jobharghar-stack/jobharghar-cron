@@ -124,6 +124,10 @@ foreach ($sources as $src) {
   $org = $src['org'] ?? 'Unknown';
   echo "Checking: {$org}\n";
 
+    // ⏱️ START PER-SOURCE TIME BUDGET
+    $sourceStart = time();
+    $MAX_SOURCE_TIME = 30; // seconds
+
   $isFirstScan = empty($seen[$org]['initialized']);
 
   $html = @file_get_contents($src['url'], false, $context);
