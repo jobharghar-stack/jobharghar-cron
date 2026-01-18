@@ -48,6 +48,37 @@ function sendTelegram($msg) {
 }
 
 /* ===============================
+   SAFE FETCH (HARD 30s LIMIT)
+   =============================== */
+
+function fetchUrl($url, $timeout = 30) {
+
+  if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
+
+  $ch = curl_init();
+  curl_setopt_array($ch, [
+    CURLOPT_URL => $url,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => false,
+
+    CURLOPT_CONNECTTIMEOUT => 5,   // DNS + TCP
+    CURLOPT_TIMEOUT => $timeout,  // TOTAL HARD LIMIT
+
+    CURLOPT_NOSIGNAL => true,
+    CURLOPT_USERAGENT => 'JobHarGharBot/1.0',
+    CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_SSL_VERIFYHOST => false,
+  ]);
+
+  $data = curl_exec($ch);
+  curl_close($ch);
+
+  return $data;
+}
+
+/* ===============================
    HELPERS
    =============================== */
 
@@ -71,7 +102,6 @@ function makeAbsoluteUrl($base, $link) {
   return $p['scheme'].'://'.$p['host'].'/'.ltrim($link,'/');
 }
 
-/* Extract date and check freshness */
 function isRecentNotice($text, $maxDays) {
   if (preg_match(
     '/(\d{1,2}\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4})/i',
@@ -83,7 +113,7 @@ function isRecentNotice($text, $maxDays) {
       return false;
     }
   }
-  return true; // allow if date not found
+  return true;
 }
 
 /* ===============================
@@ -101,21 +131,6 @@ if (!$sources || !is_array($sources)) {
 }
 
 /* ===============================
-   HTTP CONTEXT
-   =============================== */
-
-$context = stream_context_create([
-  'http' => [
-    'timeout' => 20,
-    'header'  => "User-Agent: JobHarGharBot/1.0\r\n"
-  ],
-  'ssl' => [
-    'verify_peer' => false,
-    'verify_peer_name' => false
-  ]
-]);
-
-/* ===============================
    MAIN LOOP
    =============================== */
 
@@ -124,20 +139,14 @@ foreach ($sources as $src) {
   $org = $src['org'] ?? 'Unknown';
   echo "Checking: {$org}\n";
 
-    // ⏱️ START PER-SOURCE TIME BUDGET
-    $sourceStart = time();
-    $MAX_SOURCE_TIME = 30; // seconds
-
   $isFirstScan = empty($seen[$org]['initialized']);
 
-  $html = @file_get_contents($src['url'], false, $context);
-  if (!$html || strlen($html) < 200) continue;
-
-  $cleanSourceText = cleanText($html);
-
-  /* ===============================
-     FIND HTML RECRUITMENT PAGES
-     =============================== */
+  /* ---- Fetch source page (30s max) ---- */
+  $html = fetchUrl($src['url'], 30);
+  if (!$html || strlen($html) < 200) {
+    echo "SKIP (source not responding)\n";
+    continue;
+  }
 
   preg_match_all(
     '/href=["\']([^"\']+(recruit|vacancy|notification|advertisement)[^"\']*)["\']/i',
@@ -158,15 +167,17 @@ foreach ($sources as $src) {
 
     if (isset($seen[$org]['html_job'][$pageId])) continue;
 
-    $pageHtml = @file_get_contents($pageLink, false, $context);
-    if (!$pageHtml || strlen($pageHtml) < 300) continue;
+    /* ---- Fetch detail page (30s max) ---- */
+    $pageHtml = fetchUrl($pageLink, 30);
+    if (!$pageHtml || strlen($pageHtml) < 300) {
+      echo "SKIP (page not responding)\n";
+      continue;
+    }
 
     $cleanPageText = cleanText($pageHtml);
-
     if (!isRealJobText($cleanPageText, $REQUIRED_JOB_WORDS)) continue;
     if (!isRecentNotice($cleanPageText, $MAX_NOTICE_AGE_DAYS)) continue;
 
-    // HTML recruitment alert ONCE
     if (!$isFirstScan) {
       sendTelegram(
         "🆕 Recruitment Notice\n".
@@ -180,10 +191,7 @@ foreach ($sources as $src) {
       'time' => time()
     ];
 
-    /* ===============================
-       CHECK PDF INSIDE PAGE
-       =============================== */
-
+    /* ---- Check PDFs inside page ---- */
     preg_match_all('/href=["\']([^"\']+\.pdf)["\']/i', $pageHtml, $pm);
     $pdfs = array_unique($pm[1] ?? []);
 
@@ -196,8 +204,11 @@ foreach ($sources as $src) {
         if (strpos($name, $bad) !== false) continue 2;
       }
 
-      $content = @file_get_contents($pdf, false, $context);
-      if (!$content) continue;
+      $content = fetchUrl($pdf, 30);
+      if (!$content) {
+        echo "SKIP (pdf not responding)\n";
+        continue;
+      }
 
       $hash = md5($content);
 
