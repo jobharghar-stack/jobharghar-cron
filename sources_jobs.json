@@ -7,33 +7,13 @@
     "org": "IBPS",
     "url": "https://www.ibps.in/index.php/recruitment/"
   },
-  {
-    "org": "SSC",
-    "url": "https://ssc.gov.in/home/notice-board"
-  },
     {
     "org": "SBI",
     "url": "https://sbi.bank.in/web/careers/current-openings"
   },
-  {
-    "org": "UPSC",
-    "url": "https://upsc.gov.in/recruitment/recruitment-advertisement"
-  },
-  {
-    "org": "UPSSSC",
-    "url": "https://upsssc.gov.in/AllNotifications.aspx"
-  },
     {
     "org": "AIIMS",
     "url": "https://www.aiimsexams.ac.in/advertisement/68f141523370380d8939200c"
-  },
-  {
-    "org": "RRB",
-    "url": "https://www.rrbapply.gov.in/#/auth/landing"
-  },
-    {
-    "org": "JKSSB",
-    "url": "https://www.jkssb.nic.in/Advertisement.html"
   },
    {
     "org": "RBI",
@@ -52,16 +32,8 @@
     "url": "https://www.unionbankofindia.bank.in/en/common/recruitment"
   },
      {
-    "org": "PNB",
-    "url": "https://pnb.bank.in/recruitments.aspx"
-  },
-     {
     "org": "Indian Bank",
     "url": "https://indianbank.bank.in/career/"
-  },
-  {
-    "org": "GSSSB",
-    "url": "https://gsssb.gujarat.gov.in/Notification"
   },
   {
     "org": "BTSC",
@@ -70,18 +42,6 @@
   {
     "org": "IOCL",
     "url": "https://www.iocl.com/latest-job-opening"
-  },
-  {
-    "org": "WBPPE",
-    "url": "https://wbbpe.wb.gov.in/pages/notice.aspx"
-  },
-  {
-    "org": "HPSC",
-    "url": "https://hpsc.gov.in/en-us/Instructions"
-  },
-   {
-    "org": "IB",
-    "url": "https://www.mha.gov.in/en/notifications/vacancies"
   },
   {
     "org": "BEL",
@@ -103,14 +63,6 @@
     "org": "Income Tax",
     "url": "https://incometaxindia.gov.in/Pages/recruitment-notices.aspx"
   },
-   {
-    "org": "DFCCIL",
-    "url": "https://dfccil.com/Carrer/index?Id=1"
-  },
-    {
-    "org": "SCI",
-    "url": "https://www.sci.gov.in/recruitments/"
-  },
      {
     "org": "NIOS",
     "url": "https://recruitment.nios.ac.in/"
@@ -123,9 +75,17 @@
     "org": "HFW",
     "url": "https://health.delhi.gov.in/vacancy"
   },
-   {
-    "org": "Jharkhand",
-    "url": "https://recruitment.jharkhand.gov.in/"
+  {
+    "org": "UPPBPB",
+    "url": "https://uppbpb.gov.in/Home/Notice"
+  },
+  {
+    "org": "BTSC",
+    "url": "https://btsc.bihar.gov.in/recruitment"
+  },
+  {
+    "org": "BOB",
+    "url": "https://bankofbaroda.bank.in/career/current-opportunities"
   }
 ]
 
