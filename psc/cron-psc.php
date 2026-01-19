@@ -1,4 +1,23 @@
 <?php
+$VALID_YEARS = [
+    date('Y'),          // 2026
+    date('Y') - 1       // 2025
+];
+function isRecentPdf($pdf, $validYears) {
+    $pdf = strtolower($pdf);
+
+    foreach ($validYears as $y) {
+        if (strpos($pdf, (string)$y) !== false) {
+            return true;
+        }
+    }
+
+    if (preg_match('/new|latest|current/', $pdf)) {
+        return true;
+    }
+
+    return false;
+}
 
 $sourcesFile = __DIR__ . '/sources_psc.json';
 $seenFile    = __DIR__ . '/seen_psc.json';
@@ -37,13 +56,25 @@ foreach ($sources as $src) {
     preg_match_all('/href=["\']([^"\']+\.pdf)["\']/i', $html, $m);
     $pdfs = array_unique($m[1] ?? []);
 
-    foreach ($pdfs as $pdf) {
-        if (isset($seen[$pdf])) continue;
+  foreach ($pdfs as $pdf) {
 
-        sendTelegram("{$src['org']}\n{$pdf}");
-        echo "ALERT: {$pdf}\n";
-        $seen[$pdf] = time();
+    if (!isRecentPdf($pdf, $VALID_YEARS)) {
+        continue; // ❌ ignore old PDFs
     }
+
+    if (isset($seen[$pdf])) {
+        continue; // already processed
+    }
+
+    if (!$isFirstRun) {
+        sendTelegram(
+            "{$src['org']}\n{$pdf}"
+        );
+    }
+
+    $seen[$pdf] = time();
+}
+
 }
 
 file_put_contents($seenFile, json_encode($seen, JSON_PRETTY_PRINT));
