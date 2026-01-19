@@ -1,25 +1,50 @@
-name: PSC Jobs Cron
+<?php
 
-on:
-  schedule:
-    - cron: "0 * * * *"   # Every hour
-  workflow_dispatch:
+$sourcesFile = __DIR__ . '/sources_psc.json';
+$seenFile    = __DIR__ . '/seen_psc.json';
 
-jobs:
-  run-psc-cron:
-    runs-on: ubuntu-latest
+$BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN');
+$CHAT_ID   = getenv('TELEGRAM_CHAT_ID');
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+function sendTelegram($msg) {
+    global $BOT_TOKEN, $CHAT_ID;
+    if (!$BOT_TOKEN || !$CHAT_ID) return;
+    $url = "https://api.telegram.org/bot{$BOT_TOKEN}/sendMessage";
+    file_get_contents($url . '?' . http_build_query([
+        'chat_id' => $CHAT_ID,
+        'text' => "[PSC JOB]\n" . $msg,
+        'disable_web_page_preview' => true
+    ]));
+}
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
+$sources = json_decode(file_get_contents($sourcesFile), true);
+$seen = file_exists($seenFile) ? json_decode(file_get_contents($seenFile), true) : [];
 
-      - name: Run PSC job cron
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: php psc/cron-psc.php
+foreach ($sources as $src) {
+    echo "Checking: {$src['org']}\n";
+
+    $ctx = stream_context_create([
+        'http' => ['timeout' => 50, 'header' => "User-Agent: JobHarGharBot\r\n"],
+        'ssl'  => ['verify_peer' => false, 'verify_peer_name' => false]
+    ]);
+
+    $html = @file_get_contents($src['url'], false, $ctx);
+    if (!$html || strlen($html) < 200) {
+        echo "SKIP: {$src['org']}\n";
+        continue;
+    }
+
+    preg_match_all('/href=["\']([^"\']+\.pdf)["\']/i', $html, $m);
+    $pdfs = array_unique($m[1] ?? []);
+
+    foreach ($pdfs as $pdf) {
+        if (isset($seen[$pdf])) continue;
+
+        sendTelegram("{$src['org']}\n{$pdf}");
+        echo "ALERT: {$pdf}\n";
+        $seen[$pdf] = time();
+    }
+}
+
+file_put_contents($seenFile, json_encode($seen, JSON_PRETTY_PRINT));
+echo "Done\n";
